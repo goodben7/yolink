@@ -1,0 +1,29 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{% set url = ea_url()
+    .setController('App\\Controller\\Admin\\OrderCrudController')
+    .setAction('process')
+    .setEntityId(entity_id)
+%}
+<form method="post" id="process-form" style="display: none" action="{{url}}">
+    <input type="hidden" name="token" value="{{ ea_csrf_token('ea-process') }}" />
+</form>
+
+<div id="modal-process" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h4>Demande de confirmation</h4>
+                <p>Souhaitez-vous procéder au paiement ?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">
+                    <span class="btn-label">Annuler</span>
+                </button>
+
+                <button type="submit" data-bs-dismiss="modal" class="btn btn-danger" id="modal-auth-button" form="process-form">
+                    <span class="btn-label">Confirmer</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

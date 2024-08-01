@@ -1,0 +1,98 @@
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            provider: app_user_provider
+            custom_authenticator: App\Security\UserAuthenticator
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                target: app_login
+            
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#the-firewall
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/admin, roles: ROLE_USER }
+        # - { path: ^/profile, roles: ROLE_USER }
+    
+    role_hierarchy:
+        ROLE_ADMIN:
+            - ROLE_USER
+            - ROLE_USER_VIEW 
+            - ROLE_USER_CREATE 
+            - ROLE_USER_EDIT 
+            - ROLE_TEAM_VIEW
+            - ROLE_TEAM_CREATE
+            - ROLE_TEAM_EDIT
+            - ROLE_CONTACT_VIEW
+            - ROLE_CONTACT_CREATE 
+            - ROLE_CAMPAIGN_VIEW 
+            - ROLE_ORDER_VIEW
+            - ROLE_ORDER_VALIDATE
+            - ROLE_PRICING_VIEW
+            - ROLE_PRICING_CREATE
+            - ROLE_PRICING_EDIT
+            - ROLE_PRICING_DELETE
+            - ROLE_TEAM_MENU 
+            - ROLE_USER_MENU 
+            - ROLE_CONTACT_MENU 
+            - ROLE_CAMPAIGN_MENU       
+            - ROLE_ORDER_MENU
+            - ROLE_PRICING_MENU
+            - ROLE_ADMIN_MENU
+            - ROLE_MSG_MENU
+            - ROLE_FINANCE_MENU 
+        ROLE_CUSTOMER:
+            - ROLE_USER 
+            - ROLE_CONTACT_VIEW 
+            - ROLE_CONTACT_CREATE 
+            - ROLE_CONTACT_EDIT
+            - ROLE_CONTACT_DELETE
+            - ROLE_CONTACT_IMPORT
+            - ROLE_CAMPAIGN_VIEW 
+            - ROLE_CAMPAIGN_SEND 
+            - ROLE_CAMPAIGN_EDIT 
+            - ROLE_ORDER_VIEW 
+            - ROLE_ORDER_CREATE
+            - ROLE_ORDER_PROCESS 
+            - ROLE_ORDER_EDIT
+            - ROLE_PRICING_VIEW
+            - ROLE_MSG_MENU
+            - ROLE_CAMPAIGN_MENU
+            - ROLE_CONTACT_MENU 
+            - ROLE_FINANCE_MENU 
+            - ROLE_ORDER_MENU
+
+
+when@test:
+    security:
+        password_hashers:
+            # By default, password hashers are resource intensive and take time. This is
+            # important to generate secure password hashes. In tests however, secure hashes
+            # are not important, waste resources and increase test times. The following
+            # reduces the work factor to the lowest possible values.
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon

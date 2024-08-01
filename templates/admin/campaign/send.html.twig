@@ -1,0 +1,119 @@
+{% extends ea.templatePath('layout') %}
+{% form_theme new_form with ea.crud.formThemes only %}
+
+{% block head_javascript %}
+    {{parent()}}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{% endblock head_javascript %}
+
+{% block configured_stylesheets %}
+    {{ parent() }}
+    <style>
+        .campaign_filter_result {
+            list-style-type: none;
+            margin: .5em 0;
+        }
+        .campaign_filter_result li {
+            margin: 0;
+            padding: 0;
+            display: block;
+        }
+        .campaign_filter_result li a {
+            margin: 0;
+            padding: .5em 0;
+            display: inline-block;
+        }
+        .recipiens-list {
+            padding: 1em .5em;
+            margin: .5em 0;
+            border-radius: 2px;
+        }
+    </style>
+{% endblock %}
+
+{% block content_title %}Nouvelle campagne{% endblock %}
+
+{% block page_actions %}
+    {% set url = ea_url().setAction('index') %}
+    <a href="{{url}}" class="btn btn-default">
+        <span class="fa fa-arrow-left"></span>
+        revenir à la liste
+    </a>
+    <button x-data class="action-saveAndReturn btn btn-primary action-save" type="submit" name="ea[newForm][btn]" value="saveAndReturn" data-action-name="saveAndReturn" form="send-campaign-form">
+        <span class="fa fa-send"></span>
+        <span class="btn-label">
+            <span class="action-label">Envoyer</span>
+            <span class="badge badge-light" x-text="$store.campaign.total"></span>
+        </span>
+    </button>
+{% endblock %}
+
+{% block main %}
+    {% block new_form %}
+        {{ form_start(new_form,{ 'attr': {'id': 'send-campaign-form'} }) }}
+            {{ form_row(new_form.message) }}
+            {{ form_row(new_form.sendToAllReceipient) }}
+            <div x-data x-show="$store.campaign.showFilter">
+                <div class="form-group">
+                    <label class="form-control-label required">Destinataires</label>
+                    <div x-data :class="$store.campaign.hasSelectedRecipients ? 'bg-success-subtle recipiens-list' : 'bg-danger-subtle recipiens-list'">
+                        <template x-for="item in $store.campaign.recipients" :key="item.phone">
+                            <div class="form-check">
+                                <input @click="$store.campaign.removeRecipient(item)" type="checkbox" checked="checked" class="form-check-input"/>
+                                <label x-text="item.label" class="form-check-label"  title="décochez pour suppirmer"></label>
+                            </div>
+                        </template>
+                        <p x-show="!$store.campaign.hasSelectedRecipients">Veuillez séléctionner des contacts</p>
+                    </div>
+                    <input class="form-control" x-model="$store.campaign.filter">
+                    <ul class="campaign_filter_result">
+                        <template x-for="item in $store.campaign.filterResult" :key="item.phone">
+                            <li>
+                                <a href="#" @click="$store.campaign.addRecipient(item)" x-text="item.label" title="touchez pour ajouter"></a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        {{ form_end(new_form) }}
+    {% endblock new_form %}
+{% endblock %}
+
+{% block body_javascript %}
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('campaign', {
+            toYAll: true,
+            filter: '',
+            content: '',
+            get filterResult () {
+                return this.contacts.filter(
+                    i => this.filter ? i.label.toLowerCase().includes(this.filter.toLowerCase()) : false,
+                )
+            },
+            contacts: {{ contacts | raw }},
+            recipients: [],
+            get showFilter() { return !this.toYAll },
+            get total() { return this.toYAll ? this.contacts.length : this.recipients.length },
+            toggle() {
+                this.toYAll = ! this.toYAll
+            },
+            addRecipient (item) {
+                if (this.recipients.filter(i => i.phone == item.phone).length == 0) {
+                    this.recipients.push(item)
+                }
+            },
+            removeRecipient (item) {
+                this.recipients= this.recipients.filter(i => i.phone != item.phone)
+            },
+            get targetedRecipients () {
+                var list = this.toYAll ? this.contacts: this.recipients;
+                return list.map(i => i.phone).join(',');
+            },
+            get hasSelectedRecipients () {
+                return this.recipients.length > 0;
+            }
+        })
+    })
+</script>
+{% endblock body_javascript %}

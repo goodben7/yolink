@@ -1,0 +1,22 @@
+{% extends ea.templatePath('layout') %}
+{% form_theme new_form with ea.crud.formThemes only %}
+
+{% block content_title %}Nouvelle commande{% endblock %}
+
+{% block page_actions %}
+    {% set url = ea_url().setAction('index') %}
+    <a href="{{url}}" class="btn btn-default">
+        <span class="fa fa-arrow-left"></span>
+        revenir à la liste
+    </a>
+    <button class="action-saveAndReturn btn btn-primary action-save" type="submit" name="ea[newForm][btn]" value="saveAndReturn" data-action-name="saveAndReturn" form="init-order-form">
+        <span class="fa fa-download"></span>
+        <span class="btn-label"><span class="action-label">Valider</span></span>
+    </button>
+{% endblock %}
+
+{% block main %}
+    {% block new_form %}
+        {{ form(new_form,{ 'attr': {'id': 'init-order-form'} }) }}
+    {% endblock new_form %}
+{% endblock %}
