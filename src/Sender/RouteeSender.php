@@ -13,7 +13,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class RouteeSender implements CampaignProcessorInterface {
 
-    const SENDERID = 'routee';
+    const SENDERID = '';
 
     public function __construct(
         private CacheInterface $cache,

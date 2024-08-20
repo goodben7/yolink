@@ -32,7 +32,7 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Yopay SMS');
+            ->setTitle('YoLink');
     }
 
     public function configureMenuItems(): iterable
